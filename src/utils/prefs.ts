@@ -9,8 +9,12 @@ const PREFS_PREFIX = config.prefsPrefix;
  * Wrapper of `Zotero.Prefs.get`.
  * @param key
  */
-export function getPref<K extends keyof PluginPrefsMap>(key: K) {
-  return Zotero.Prefs.get(`${PREFS_PREFIX}.${key}`, true) as PluginPrefsMap[K];
+export function getPref<K extends keyof PluginPrefsMap | string>(key: K) {
+  return Zotero.Prefs.get(`${PREFS_PREFIX}.${String(key)}`, true) as
+    | PluginPrefsMap[Extract<K, keyof PluginPrefsMap>]
+    | undefined
+    | string
+    | boolean;
 }
 
 /**
@@ -19,11 +23,11 @@ export function getPref<K extends keyof PluginPrefsMap>(key: K) {
  * @param key
  * @param value
  */
-export function setPref<K extends keyof PluginPrefsMap>(
+export function setPref<K extends keyof PluginPrefsMap | string>(
   key: K,
-  value: PluginPrefsMap[K],
+  value: K extends keyof PluginPrefsMap ? PluginPrefsMap[K] : any,
 ) {
-  return Zotero.Prefs.set(`${PREFS_PREFIX}.${key}`, value, true);
+  return Zotero.Prefs.set(`${PREFS_PREFIX}.${String(key)}`, value, true);
 }
 
 /**

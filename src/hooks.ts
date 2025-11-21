@@ -8,6 +8,11 @@ import {
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
+import {
+  openWorkspaceDialog,
+  registerWorkspaceMenu,
+  registerWorkspaceSection,
+} from "./modules/aiWorkspace";
 
 async function onStartup() {
   await Promise.all([
@@ -33,6 +38,8 @@ async function onStartup() {
   UIExampleFactory.registerItemPaneSection();
 
   UIExampleFactory.registerReaderItemPaneSection();
+
+  registerWorkspaceSection();
 
   await Promise.all(
     Zotero.getMainWindows().map((win) => onMainWindowLoad(win)),
@@ -82,6 +89,8 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
 
   PromptExampleFactory.registerConditionalCommandExample();
 
+  registerWorkspaceMenu();
+
   await Zotero.Promise.delay(1000);
 
   popupWin.changeLine({
@@ -90,7 +99,10 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   });
   popupWin.startCloseTimer(5000);
 
-  addon.hooks.onDialogEvents("dialogExample");
+  // The AI workspace dialog can be launched from the item menu or the item pane section.
+  if (!addon.data.aiSession?.history?.length) {
+    openWorkspaceDialog();
+  }
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {

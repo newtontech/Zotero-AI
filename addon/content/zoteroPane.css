@@ -1,3 +1,48 @@
 .makeItRed {
   background-color: tomato;
 }
+
+.ai-workspace-card {
+  padding: 12px;
+  border: 1px solid var(--fill-section-border);
+  border-radius: 8px;
+  background: var(--fill-section);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-workspace-heading {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.ai-workspace-summary {
+  color: var(--text-color-secondary);
+}
+
+.ai-workspace-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ai-workspace-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ai-workspace-line {
+  padding: 6px 4px;
+  border-bottom: 1px dashed var(--fill-section-border);
+}
+
+.ai-workspace-context {
+  font-size: 11px;
+  color: var(--text-color-secondary);
+}
+
+#ai-workspace-status {
+  margin-top: 6px;
+  font-size: 0.9em;
+  color: var(--text-color-secondary);
+}

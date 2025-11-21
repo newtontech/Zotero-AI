@@ -7,11 +7,10 @@ export default defineConfig({
   name: pkg.config.addonName,
   id: pkg.config.addonID,
   namespace: pkg.config.addonRef,
-  updateURL: `https://github.com/{{owner}}/{{repo}}/releases/download/release/${
+  updateURL: `https://raw.githubusercontent.com/Zotero-AI/Zotero-AI/main/release/${
     pkg.version.includes("-") ? "update-beta.json" : "update.json"
   }`,
-  xpiDownloadLink:
-    "https://github.com/{{owner}}/{{repo}}/releases/download/v{{version}}/{{xpiName}}.xpi",
+  xpiDownloadLink: `https://raw.githubusercontent.com/Zotero-AI/Zotero-AI/main/release/zotero-ai-${pkg.version}.xpi`,
 
   build: {
     assets: ["addon/**/*.*"],

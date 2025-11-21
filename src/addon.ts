@@ -18,8 +18,16 @@ class Addon {
       window: Window;
       columns: Array<ColumnOptions>;
       rows: Array<{ [dataKey: string]: string }>;
+      settings?: Record<string, string>;
     };
     dialog?: DialogHelper;
+    aiSession?: {
+      history: Array<{
+        role: "user" | "assistant";
+        content: string;
+        contextLabel?: string;
+      }>;
+    };
   };
   // Lifecycle hooks
   public hooks: typeof hooks;

@@ -1,7 +1,10 @@
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
-import { registerWorkspaceMenu, registerWorkspaceSection } from "./modules/aiWorkspace";
+import {
+  registerWorkspaceMenu,
+  registerWorkspaceSection,
+} from "./modules/aiWorkspace";
 
 async function onStartup() {
   await Promise.all([

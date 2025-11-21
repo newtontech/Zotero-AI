@@ -144,8 +144,13 @@ async function updatePrefsUI() {
 
 function bindPrefEvents() {
   const prefs = addon.data.prefs;
-  if (!prefs) return;
+  if (!prefs?.window) return;
   const doc = prefs.window.document;
+  if (!doc) return;
+  if (!prefs.settings) {
+    prefs.settings = { ...DEFAULT_SETTINGS };
+  }
+  const settings = prefs.settings;
   const bindings: Array<{
     selector: string;
     key: AISettingKey;
@@ -180,11 +185,14 @@ function bindPrefEvents() {
   bindings.forEach(({ selector, key }) => {
     const element = doc.querySelector(selector) as HTMLInputElement | null;
     if (!element) return;
-    element.value = prefs.settings[key];
+    element.value = settings[key] ?? "";
     element.addEventListener("change", (e: Event) => {
       const target = e.target as HTMLInputElement;
       const nextValue = target.value;
-      prefs.settings[key] = nextValue;
+      settings[key] = nextValue;
+      if (prefs.settings) {
+        prefs.settings[key] = nextValue;
+      }
       setPref(key, nextValue);
     });
   });

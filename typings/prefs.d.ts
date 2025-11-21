@@ -7,8 +7,12 @@
 declare namespace _ZoteroTypes {
   interface Prefs {
     PluginPrefsMap: {
-      "enable": boolean;
-      "input": string;
+      "openaiKey": string;
+      "openaiModel": string;
+      "deepseekKey": string;
+      "deepseekModel": string;
+      "conversationMode": string;
+      "agentTone": string;
     };
   }
 }

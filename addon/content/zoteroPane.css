@@ -40,3 +40,9 @@
   font-size: 11px;
   color: var(--text-color-secondary);
 }
+
+#ai-workspace-status {
+  margin-top: 6px;
+  font-size: 0.9em;
+  color: var(--text-color-secondary);
+}

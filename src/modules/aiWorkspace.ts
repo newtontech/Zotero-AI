@@ -1,69 +1,11 @@
 import { getLocaleID, getString } from "../utils/locale";
-import { getPref } from "../utils/prefs";
-
-interface ChatTurn {
-  role: "user" | "assistant";
-  content: string;
-  contextLabel?: string;
-}
-
-interface WorkspaceContext {
-  items: Zotero.Item[];
-  label: string;
-  attachments: number;
-}
-
-function resolveTone(): string {
-  const tonePref = (getPref("agentTone") as string) || "concise";
-  switch (tonePref) {
-    case "creative":
-      return getString("workspace-tone-creative");
-    case "detailed":
-      return getString("workspace-tone-detailed");
-    default:
-      return getString("workspace-tone-concise");
-  }
-}
-
-function collectContext(): WorkspaceContext {
-  const pane = ztoolkit.getGlobal("ZoteroPane");
-  const items: Zotero.Item[] = pane?.getSelectedItems?.() || [];
-  const collection = pane?.getSelectedCollection?.();
-  const collectionItems = collection?.getChildItems?.();
-  const mode = (getPref("conversationMode") as string) || "auto";
-
-  let combined: Zotero.Item[] = [];
-  if (mode === "item") {
-    combined = items;
-  } else if (mode === "collection" && Array.isArray(collectionItems)) {
-    combined = collectionItems as Zotero.Item[];
-  } else if (items.length) {
-    combined = items;
-  } else if (Array.isArray(collectionItems)) {
-    combined = collectionItems as Zotero.Item[];
-  }
-
-  const labelParts: string[] = [];
-  if (collection?.name) {
-    labelParts.push(`${collection.name}`);
-  }
-  if (combined.length) {
-    labelParts.push(`${combined.length} ${getString("workspace-items")}`);
-  }
-
-  const attachments = combined.reduce((acc, item) => {
-    if (typeof (item as any).getAttachments === "function") {
-      return acc + ((item as any).getAttachments() as number[]).length;
-    }
-    return acc;
-  }, 0);
-
-  return {
-    items: combined,
-    label: labelParts.join(" · ") || getString("workspace-empty"),
-    attachments,
-  };
-}
+import {
+  ChatTurn,
+  WorkspaceContext,
+  collectContext,
+  describeItems,
+} from "./workspaceContext";
+import { requestLLMCompletion, summarizeContextForHistory } from "./llmClient";
 
 function renderHistory(container: HTMLElement, history: ChatTurn[]) {
   const doc = container.ownerDocument;
@@ -83,23 +25,10 @@ function renderHistory(container: HTMLElement, history: ChatTurn[]) {
   });
 }
 
-function describeItems(items: Zotero.Item[], attachments: number) {
-  if (!items.length) return getString("workspace-empty");
-  const topItems = items.slice(0, 3).map((item) => {
-    const title = item.getField("title") || item.getDisplayTitle?.() || "";
-    const creators = (item as any).getCreators?.()?.slice?.(0, 2) || [];
-    const names = creators
-      .map(
-        (creator: any) => creator.name || creator.lastName || creator.firstName,
-      )
-      .filter(Boolean);
-    return `${title}${names.length ? ` — ${names.join(", ")}` : ""}`;
-  });
-  const more = items.length > 3 ? ` +${items.length - 3}` : "";
-  const attachmentText = attachments
-    ? ` · ${attachments} ${getString("workspace-pdfs")}`
-    : "";
-  return `${topItems.join(" | ")}${more}${attachmentText}`;
+function updateStatus(doc: Document, text: string) {
+  const status = doc.getElementById("ai-workspace-status");
+  if (!status) return;
+  status.textContent = text;
 }
 
 function synthesizeAnswer(
@@ -107,13 +36,12 @@ function synthesizeAnswer(
   context: WorkspaceContext,
   history: ChatTurn[],
 ) {
-  const tone = resolveTone();
   const intro = getString("workspace-answer-intro");
   const contextText = describeItems(context.items, context.attachments);
   const followup = history.length
     ? getString("workspace-answer-followup")
     : getString("workspace-answer-first");
-  return `${intro} ${tone}\n${getString("workspace-answer-context")} ${contextText}\n${followup}\n\n${getString("workspace-answer-echo")} ${question}`;
+  return `${intro}\n${getString("workspace-answer-context")} ${contextText}\n${followup}\n\n${getString("workspace-answer-echo")} ${question}`;
 }
 
 function buildSectionBody(body: HTMLElement, context: WorkspaceContext) {
@@ -235,37 +163,69 @@ export function openWorkspaceDialog() {
     },
   });
 
+  dialogHelper.addCell(4, 0, {
+    tag: "div",
+    namespace: "html",
+    attributes: { id: "ai-workspace-status" },
+    styles: {
+      color: "var(--text-color-deemphasized)",
+      minHeight: "20px",
+    },
+  });
+
   dialogHelper
     .addButton(getString("workspace-send"), "send", {
-      callback: () => {
+      callback: async () => {
         const doc = dialogHelper.window?.document;
         if (!doc) return false;
         const textarea = doc?.getElementById(
           "ai-workspace-question",
         ) as HTMLTextAreaElement | null;
         const question = textarea?.value.trim();
-        if (!question) return false;
+        if (!question) {
+          updateStatus(doc, getString("workspace-error-empty-question"));
+          return false;
+        }
         const context = collectContext();
         addon.data.aiSession!.history.push({
           role: "user",
           content: question,
           contextLabel: context.label,
         });
-        const answer = synthesizeAnswer(
-          question,
-          context,
-          addon.data.aiSession!.history,
-        );
-        addon.data.aiSession!.history.push({
-          role: "assistant",
-          content: answer,
-          contextLabel: describeItems(context.items, context.attachments),
-        });
         textarea!.value = "";
         const container = doc.getElementById(
           "ai-workspace-history",
         ) as HTMLElement | null;
         if (container) renderHistory(container, addon.data.aiSession!.history);
+        updateStatus(doc, getString("workspace-status-waiting"));
+        try {
+          const answer = await requestLLMCompletion(
+            question,
+            context,
+            addon.data.aiSession!.history,
+          );
+          addon.data.aiSession!.history.push({
+            role: "assistant",
+            content: answer,
+            contextLabel: summarizeContextForHistory(context),
+          });
+          if (container)
+            renderHistory(container, addon.data.aiSession!.history);
+          updateStatus(doc, "");
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error
+              ? err.message
+              : getString("workspace-status-error");
+          addon.data.aiSession!.history.push({
+            role: "assistant",
+            content: `${getString("workspace-error-generic")}: ${message}`,
+            contextLabel: summarizeContextForHistory(context),
+          });
+          if (container)
+            renderHistory(container, addon.data.aiSession!.history);
+          updateStatus(doc, message);
+        }
         return false;
       },
     })

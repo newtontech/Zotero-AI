@@ -1,7 +1,7 @@
 {
   "name": "zotero-ai",
   "type": "module",
-  "version": "3.1.0",
+  "version": "0.0.1-beta",
   "description": "AI workspace for Zotero with Bohrium-style local chat",
   "config": {
     "addonName": "Zotero AI",
@@ -12,13 +12,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/Zotero-AI.git"
+    "url": "git+https://github.com/Zotero-AI/Zotero-AI.git"
   },
   "author": "Zotero AI contributors",
   "bugs": {
-    "url": "https://github.com/your-org/Zotero-AI/issues"
+    "url": "https://github.com/Zotero-AI/Zotero-AI/issues"
   },
-  "homepage": "https://github.com/your-org/Zotero-AI#readme",
+  "homepage": "https://github.com/Zotero-AI/Zotero-AI#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",

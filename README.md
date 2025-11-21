@@ -14,6 +14,23 @@ Zotero AI brings a Bohrium-inspired knowledge workspace directly into Zotero. It
 
 ## Installation
 
+### Quick install (prebuilt 0.0.1-beta)
+
+1. Download the signed XPI from the `release` folder (no build needed):
+   - From this repository: [`release/zotero-ai-0.0.1-beta.xpi`](release/zotero-ai-0.0.1-beta.xpi)
+   - Direct raw link: https://raw.githubusercontent.com/Zotero-AI/Zotero-AI/main/release/zotero-ai-0.0.1-beta.xpi
+2. In Zotero, open **Tools → Add-ons**, choose **Install Add-on From File…**, and select the downloaded XPI.
+3. Automatic beta updates are served from `release/update-beta.json`, so you can stay on the beta channel without rebuilding.
+
+### Post-install setup
+
+1. Open **Edit → Preferences → Zotero AI**.
+2. Paste your **OpenAI** or **DeepSeek** API key and preferred model.
+3. Pick the default conversation scope (auto/item/collection) and response tone, then save.
+4. Ensure Zotero can reach the internet so the plugin can call your chosen LLM provider.
+
+### Build from source
+
 1. Install Node.js LTS and a Zotero 7 build.
 2. Clone this repository and install dependencies:
    ```sh

@@ -5,23 +5,86 @@
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });"
 >
   <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
-  <checkbox
-    id="zotero-prefpane-__addonRef__-enable"
-    preference="enable"
-    data-l10n-id="pref-enable"
-  />
-  <hbox>
-    <html:label
-      for="zotero-prefpane-__addonRef__-input"
-      data-l10n-id="pref-input"
-    ></html:label>
-    <html:input
-      type="text"
-      id="zotero-prefpane-__addonRef__-input"
-      preference="input"
-    ></html:input>
-  </hbox>
-  <hbox class="virtualized-table-container" flex="1" height="300px">
+  <description data-l10n-id="pref-intro" />
+  <separator />
+  <vbox id="__addonRef__-keys" spacing="8">
+    <hbox align="center">
+      <html:label
+        for="zotero-prefpane-__addonRef__-openai-key"
+        data-l10n-id="pref-openai-key"
+      ></html:label>
+      <html:input
+        type="password"
+        id="zotero-prefpane-__addonRef__-openai-key"
+        preference="openaiKey"
+      ></html:input>
+    </hbox>
+    <hbox align="center">
+      <html:label
+        for="zotero-prefpane-__addonRef__-openai-model"
+        data-l10n-id="pref-openai-model"
+      ></html:label>
+      <html:input
+        type="text"
+        id="zotero-prefpane-__addonRef__-openai-model"
+        preference="openaiModel"
+      ></html:input>
+    </hbox>
+    <hbox align="center">
+      <html:label
+        for="zotero-prefpane-__addonRef__-deepseek-key"
+        data-l10n-id="pref-deepseek-key"
+      ></html:label>
+      <html:input
+        type="password"
+        id="zotero-prefpane-__addonRef__-deepseek-key"
+        preference="deepseekKey"
+      ></html:input>
+    </hbox>
+    <hbox align="center">
+      <html:label
+        for="zotero-prefpane-__addonRef__-deepseek-model"
+        data-l10n-id="pref-deepseek-model"
+      ></html:label>
+      <html:input
+        type="text"
+        id="zotero-prefpane-__addonRef__-deepseek-model"
+        preference="deepseekModel"
+      ></html:input>
+    </hbox>
+    <hbox align="center">
+      <html:label
+        for="zotero-prefpane-__addonRef__-conversation-mode"
+        data-l10n-id="pref-conversation-mode"
+      ></html:label>
+      <menulist id="zotero-prefpane-__addonRef__-conversation-mode">
+        <menupopup>
+          <menuitem value="auto" data-l10n-id="pref-conversation-auto" />
+          <menuitem value="item" data-l10n-id="pref-conversation-item" />
+          <menuitem
+            value="collection"
+            data-l10n-id="pref-conversation-collection"
+          />
+        </menupopup>
+      </menulist>
+    </hbox>
+    <hbox align="center">
+      <html:label
+        for="zotero-prefpane-__addonRef__-agent-tone"
+        data-l10n-id="pref-agent-tone"
+      ></html:label>
+      <menulist id="zotero-prefpane-__addonRef__-agent-tone">
+        <menupopup>
+          <menuitem value="concise" data-l10n-id="pref-tone-concise" />
+          <menuitem value="detailed" data-l10n-id="pref-tone-detailed" />
+          <menuitem value="creative" data-l10n-id="pref-tone-creative" />
+        </menupopup>
+      </menulist>
+    </hbox>
+  </vbox>
+  <separator />
+  <label data-l10n-id="pref-capability-title" />
+  <hbox class="virtualized-table-container" flex="1" height="260px">
     <html:div id="__addonRef__-table-container" />
   </hbox>
 </groupbox>

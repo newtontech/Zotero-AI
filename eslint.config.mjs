@@ -7,8 +7,7 @@ export default zotero({
     {
       files: ["**/*.ts"],
       rules: {
-        // We disable this rule here because the template
-        // contains some unused examples and variables
+        // The AI workspace relies on toolkit globals that may look unused to ESLint
         "@typescript-eslint/no-unused-vars": "off",
       },
     },

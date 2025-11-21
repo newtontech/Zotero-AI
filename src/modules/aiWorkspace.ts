@@ -66,13 +66,15 @@ function collectContext(): WorkspaceContext {
 }
 
 function renderHistory(container: HTMLElement, history: ChatTurn[]) {
+  const doc = container.ownerDocument;
+  if (!doc) return;
   container.replaceChildren();
   history.forEach((turn) => {
-    const row = container.ownerDocument.createElement("div");
+    const row = doc.createElement("div");
     row.classList.add("ai-workspace-line");
     row.textContent = `${turn.role === "user" ? "🧑" : "🤖"} ${turn.content}`;
     if (turn.contextLabel) {
-      const detail = container.ownerDocument.createElement("div");
+      const detail = doc.createElement("div");
       detail.classList.add("ai-workspace-context");
       detail.textContent = turn.contextLabel;
       row.appendChild(detail);
@@ -117,6 +119,7 @@ function synthesizeAnswer(
 function buildSectionBody(body: HTMLElement, context: WorkspaceContext) {
   body.replaceChildren();
   const doc = body.ownerDocument;
+  if (!doc) return;
   const card = doc.createElement("div");
   card.classList.add("ai-workspace-card");
 
@@ -236,6 +239,7 @@ export function openWorkspaceDialog() {
     .addButton(getString("workspace-send"), "send", {
       callback: () => {
         const doc = dialogHelper.window?.document;
+        if (!doc) return false;
         const textarea = doc?.getElementById(
           "ai-workspace-question",
         ) as HTMLTextAreaElement | null;
@@ -258,7 +262,7 @@ export function openWorkspaceDialog() {
           contextLabel: describeItems(context.items, context.attachments),
         });
         textarea!.value = "";
-        const container = doc?.getElementById(
+        const container = doc.getElementById(
           "ai-workspace-history",
         ) as HTMLElement | null;
         if (container) renderHistory(container, addon.data.aiSession!.history);
@@ -268,7 +272,7 @@ export function openWorkspaceDialog() {
     .addButton(getString("workspace-close"), "cancel");
 
   dialogHelper.open(getString("workspace-dialog-title"));
-  const container = dialogHelper.window?.document.getElementById(
+  const container = dialogHelper.window?.document?.getElementById(
     "ai-workspace-history",
   ) as HTMLElement | null;
   if (container) renderHistory(container, addon.data.aiSession.history);

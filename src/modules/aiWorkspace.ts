@@ -175,6 +175,46 @@ function buildSectionBody(
   const inputArea = doc.createElement("div");
   inputArea.classList.add("ai-workspace-input");
 
+  const templateRow = doc.createElement("div");
+  templateRow.classList.add("ai-workspace-templates");
+
+  const templateLabel = doc.createElement("label");
+  templateLabel.classList.add("ai-workspace-templates-label");
+  templateLabel.textContent = getString("workspace-templates-label");
+
+  const templateSelect = doc.createElement("select");
+  templateSelect.classList.add("ai-workspace-template-select");
+  [
+    ["summary", getString("workspace-template-summary")],
+    ["methods", getString("workspace-template-methods")],
+    ["review", getString("workspace-template-review")],
+  ].forEach(([value, label]) => {
+    const option = doc.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    templateSelect.appendChild(option);
+  });
+
+  const templateBtn = doc.createElement("button");
+  templateBtn.classList.add("ai-workspace-template-insert");
+  templateBtn.textContent = "→";
+  templateBtn.title = getString("workspace-templates-label");
+  templateBtn.addEventListener("click", () => {
+    const text = templateSelect.selectedOptions?.[0]?.textContent || "";
+    if (!text) return;
+    const caret = textarea.selectionStart || textarea.value.length;
+    const before = textarea.value.slice(0, caret);
+    const after = textarea.value.slice(caret);
+    textarea.value = `${before}${text}\n\n${after}`;
+    textarea.focus();
+    const newPos = before.length + text.length + 2;
+    textarea.selectionStart = textarea.selectionEnd = newPos;
+  });
+
+  templateRow.appendChild(templateLabel);
+  templateRow.appendChild(templateSelect);
+  templateRow.appendChild(templateBtn);
+
   const textarea = doc.createElement("textarea");
   textarea.id = `${PANEL_ID}-question`;
   textarea.placeholder = getString("workspace-question-placeholder");
@@ -241,6 +281,7 @@ function buildSectionBody(
 
   sendButton.addEventListener("click", () => void sendHandler());
 
+  inputArea.appendChild(templateRow);
   inputArea.appendChild(textarea);
   footer.appendChild(sendButton);
 

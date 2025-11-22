@@ -83,6 +83,26 @@
   padding: 8px;
 }
 
+.ai-workspace-templates {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ai-workspace-template-select {
+  flex: 1;
+}
+
+.ai-workspace-template-insert {
+  padding: 6px 10px;
+}
+
+.ai-workspace-templates-label {
+  font-size: 12px;
+  color: var(--text-color-secondary);
+}
+
 .ai-workspace-footer {
   display: flex;
   justify-content: flex-end;

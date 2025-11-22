@@ -77,6 +77,10 @@ export type FluentMessageId =
   | 'workspace-status-error'
   | 'workspace-status-waiting'
   | 'workspace-system-prompt'
+  | 'workspace-template-methods'
+  | 'workspace-template-review'
+  | 'workspace-template-summary'
+  | 'workspace-templates-label'
   | 'workspace-tone-concise'
   | 'workspace-tone-creative'
   | 'workspace-tone-detailed';

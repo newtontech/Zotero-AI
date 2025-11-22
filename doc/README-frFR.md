@@ -1,6 +1,6 @@
-# Zotero AI
+# Zotero AI Newton
 
-Zotero AI apporte dans Zotero un espace de connaissance inspiré de Bohrium. Vous pouvez dialoguer avec un article, ses PDF liés ou un dossier entier en utilisant vos modèles LLM favoris tout en gardant les données localement.
+Zotero AI Newton apporte dans Zotero un espace de connaissance inspiré de Bohrium. Vous pouvez dialoguer avec un article, ses PDF liés ou un dossier entier en utilisant vos modèles LLM favoris tout en gardant les données localement.
 
 ## Fonctionnalités
 
@@ -15,8 +15,8 @@ Zotero AI apporte dans Zotero un espace de connaissance inspiré de Bohrium. Vou
 ### Installation rapide (0.0.1-beta précompilé)
 
 1. Téléchargez l’XPI prêt à l’emploi (aucune compilation requise) :
-   - Depuis ce dépôt : [`release/zotero-ai-0.0.1-beta.xpi`](../release/zotero-ai-0.0.1-beta.xpi)
-   - Lien brut : <https://raw.githubusercontent.com/Zotero-AI/Zotero-AI/main/release/zotero-ai-0.0.1-beta.xpi>
+   - Depuis ce dépôt : [`release/zotero-ai-newton-0.0.1-beta.xpi`](../release/zotero-ai-newton-0.0.1-beta.xpi)
+   - Lien brut : <https://raw.githubusercontent.com/newtontech/Zotero-AI-Newton/main/release/zotero-ai-newton-0.0.1-beta.xpi>
 2. Dans Zotero, ouvrez **Outils → Modules complémentaires**, cliquez sur **Installer un module depuis un fichier…** et sélectionnez l’XPI téléchargé.
 3. Les mises à jour bêta automatiques utilisent `release/update-beta.json`, ce qui évite toute recompilation.
 
@@ -36,7 +36,7 @@ Zotero AI apporte dans Zotero un espace de connaissance inspiré de Bohrium. Vou
 
 ## Configuration
 
-Dans **Édition → Préférences → Zotero AI**, renseignez vos clés API, modèles par défaut, portée de conversation (élément, collection ou automatique) et ton de réponse. Les paramètres restent locaux et alimentent l’espace IA.
+Dans **Édition → Préférences → Zotero AI Newton**, renseignez vos clés API, modèles par défaut, portée de conversation (élément, collection ou automatique) et ton de réponse. Les paramètres restent locaux et alimentent l’espace IA.
 
 ## Utilisation
 

@@ -1,4 +1,4 @@
-pref-title = Zotero AI 工作台
+pref-title = Zotero AI Newton 工作台
 pref-intro = 配置本地代理的模型密钥与回答风格。密钥仅保存在本地，用于在条目或文件夹里向 AI 追问。
 pref-openai-key = OpenAI / 兼容接口密钥
 pref-openai-model = 首选 OpenAI 模型

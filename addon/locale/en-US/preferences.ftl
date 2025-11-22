@@ -1,4 +1,4 @@
-pref-title = Zotero AI Workspace
+pref-title = Zotero AI Newton Workspace
 pref-intro = Configure local agent credentials and dialogue style. Keys are stored locally and used when you ask AI questions from Zotero items or collections.
 pref-openai-key = OpenAI / compatible API key
 pref-openai-model = Preferred OpenAI model

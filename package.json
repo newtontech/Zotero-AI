@@ -1,10 +1,10 @@
 {
-  "name": "zotero-ai",
+  "name": "zotero-ai-newton",
   "type": "module",
   "version": "0.0.1-beta",
   "description": "AI workspace for Zotero with Bohrium-style local chat",
   "config": {
-    "addonName": "Zotero AI",
+    "addonName": "Zotero AI Newton",
     "addonID": "zotero-ai@local",
     "addonRef": "zoteroai",
     "addonInstance": "ZoteroAI",
@@ -12,17 +12,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Zotero-AI/Zotero-AI.git"
+    "url": "git+https://github.com/newtontech/Zotero-AI-Newton.git"
   },
-  "author": "Zotero AI contributors",
+  "author": "Zotero AI Newton contributors",
   "bugs": {
-    "url": "https://github.com/Zotero-AI/Zotero-AI/issues"
+    "url": "https://github.com/newtontech/Zotero-AI-Newton/issues"
   },
-  "homepage": "https://github.com/Zotero-AI/Zotero-AI#readme",
+  "homepage": "https://github.com/newtontech/Zotero-AI-Newton#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",
-    "build": "zotero-plugin build && tsc --noEmit",
+    "build": "zotero-plugin build && mv .scaffold/build/zotero-ai-newton.xpi .scaffold/build/zotero-ai-newton-$npm_package_version.xpi && cp .scaffold/build/zotero-ai-newton-$npm_package_version.xpi release/ && tsc --noEmit",
     "lint:check": "prettier --check . && eslint .",
     "lint:fix": "prettier --write . && eslint . --fix",
     "release": "zotero-plugin release",

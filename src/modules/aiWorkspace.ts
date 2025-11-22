@@ -50,6 +50,49 @@ function getWorkspaceBodies() {
   return data.workspaceBodies as WeakMap<Window, HTMLElement>;
 }
 
+export async function ensureReaderSidebar(doc: Document) {
+  const deck = doc.querySelector(".notes-pane-deck") as any;
+  const tabbox = deck?.parentElement as any;
+  const tabs = tabbox?.querySelector?.("tabs") as any;
+  if (!deck || !tabs || !tabbox) return;
+  if (doc.getElementById("zotero-ai-reader-tab")) return;
+
+  const tab =
+    (doc as any).createXULElement?.("tab") ?? doc.createElement("tab");
+  tab.id = "zotero-ai-reader-tab";
+  tab.setAttribute("label", getString("workspace-section-label"));
+  tab.setAttribute(
+    "image",
+    `chrome://${addon.data.config.addonRef}/content/icons/sidebar-16.svg`,
+  );
+
+  const panel =
+    (doc as any).createXULElement?.("tabpanel") ?? doc.createElement("tabpanel");
+  panel.id = "zotero-ai-reader-panel";
+
+  const body = doc.createElement("div");
+  body.classList.add("ai-workspace-reader-panel");
+  panel.appendChild(body);
+
+  buildSectionBody(
+    body as HTMLElement,
+    resolveContextFromArgs("reader", undefined),
+  );
+
+  tabs.appendChild(tab);
+  deck.appendChild(panel);
+
+  const updateDeck = () => {
+    const idx = Array.from(tabs.children).indexOf(tab);
+    if (idx >= 0) deck.selectedIndex = idx;
+  };
+
+  tab.addEventListener("command", updateDeck);
+  tabs.addEventListener("select", () => {
+    deck.selectedIndex = (tabs as any).selectedIndex ?? 0;
+  });
+}
+
 function resolveContextFromArgs(
   tabType: "library" | "reader",
   item?: Zotero.Item | null,

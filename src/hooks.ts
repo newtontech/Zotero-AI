@@ -2,6 +2,7 @@ import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
 import {
+  ensureReaderSidebar,
   registerWorkspaceMenu,
   registerWorkspaceSection,
 } from "./modules/aiWorkspace";
@@ -23,6 +24,12 @@ async function onStartup() {
     Zotero.getMainWindows().map((win) => onMainWindowLoad(win)),
   );
 
+  // Make sure reader sidebar tab exists whenever the reader deck changes
+  void ztoolkit.Reader?.addReaderTabPanelDeckObserver?.(() => {
+    const main = Zotero.getMainWindow();
+    if (main?.document) ensureReaderSidebar(main.document);
+  });
+
   // Mark initialized as true to confirm plugin loading status
   // outside of the plugin (e.g. scaffold testing process)
   addon.data.initialized = true;
@@ -37,6 +44,8 @@ async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   );
 
   injectWorkspaceStyles(win);
+
+  ensureReaderSidebar(win.document);
 
   registerWorkspaceMenu();
 }

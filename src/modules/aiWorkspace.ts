@@ -50,7 +50,29 @@ function getWorkspaceBodies() {
   return data.workspaceBodies as WeakMap<Window, HTMLElement>;
 }
 
-function buildSectionBody(body: HTMLElement, context: WorkspaceContext) {
+function resolveContextFromArgs(
+  tabType: "library" | "reader",
+  item?: Zotero.Item | null,
+) {
+  if (tabType === "reader" && item) {
+    const attachments =
+      typeof (item as any).getAttachments === "function"
+        ? ((item as any).getAttachments() as number[]).length
+        : 0;
+    return {
+      items: [item],
+      label: item.getDisplayTitle?.() || item.getField("title") || "",
+      attachments,
+    } as WorkspaceContext;
+  }
+  return collectContext();
+}
+
+function buildSectionBody(
+  body: HTMLElement,
+  context: WorkspaceContext,
+  setSectionSummary?: (summary: string) => void,
+) {
   body.replaceChildren();
   const doc = body.ownerDocument;
   if (!doc) return;
@@ -191,6 +213,10 @@ function buildSectionBody(body: HTMLElement, context: WorkspaceContext) {
   contextSummary.textContent = describeItems(context.items, context.attachments);
   panel.insertBefore(contextSummary, historyContainer);
 
+  if (setSectionSummary) {
+    setSectionSummary(context.label);
+  }
+
   body.appendChild(panel);
 }
 
@@ -200,14 +226,35 @@ export function registerWorkspaceSection() {
     pluginID: addon.data.config.addonID,
     header: {
       l10nID: getLocaleID("workspace-section-label"),
-      icon: "chrome://zotero/skin/16/universal/highlights.svg",
+      icon: `chrome://${addon.data.config.addonRef}/content/icons/sidebar-16.svg`,
     },
     sidenav: {
       l10nID: getLocaleID("workspace-section-tooltip"),
-      icon: "chrome://zotero/skin/20/universal/note.svg",
+      icon: `chrome://${addon.data.config.addonRef}/content/icons/sidebar-20.svg`,
     },
-    onRender: ({ body }) => {
-      buildSectionBody(body as HTMLElement, collectContext());
+    onRender: ({
+      body,
+      tabType,
+      item,
+      setSectionSummary,
+    }: _ZoteroTypes.ItemPaneManagerSection.SectionHookArgs) => {
+      buildSectionBody(
+        body as HTMLElement,
+        resolveContextFromArgs(tabType, item),
+        setSectionSummary,
+      );
+    },
+    onItemChange: ({
+      body,
+      tabType,
+      item,
+      setSectionSummary,
+    }: _ZoteroTypes.ItemPaneManagerSection.SectionHookArgs) => {
+      buildSectionBody(
+        body as HTMLElement,
+        resolveContextFromArgs(tabType, item),
+        setSectionSummary,
+      );
     },
   });
 }

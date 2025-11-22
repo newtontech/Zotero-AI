@@ -191,35 +191,78 @@ function bindPrefEvents() {
   ];
 
   bindings.forEach(({ selector, key }) => {
-    const element = doc.querySelector(selector) as HTMLInputElement | null;
+    const element = doc.querySelector(selector) as HTMLElement | null;
     if (!element) return;
-    element.value = settings[key] ?? "";
-    element.addEventListener("change", (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      const nextValue = target.value;
+    const applyValue = (next: string) => {
+      if ("value" in (element as any)) {
+        (element as any).value = next;
+      }
+      element.setAttribute("value", next);
+      const menuitem = element.querySelector?.(
+        `menuitem[value="${CSS.escape(next)}"]`,
+      ) as any;
+      if (menuitem && "selectedItem" in (element as any)) {
+        (element as any).selectedItem = menuitem;
+      }
+    };
+
+    const commitValue = (nextValue: string) => {
       settings[key] = nextValue;
       if (prefs.settings) {
         prefs.settings[key] = nextValue;
       }
       if (key === "provider") {
+        const apiBaseEl = doc.querySelector(
+          `#zotero-prefpane-${config.addonRef}-api-base`,
+        ) as HTMLInputElement | null;
+        const apiModelEl = doc.querySelector(
+          `#zotero-prefpane-${config.addonRef}-api-model`,
+        ) as HTMLInputElement | null;
         if (nextValue === "openai" && !settings.apiBase) {
           settings.apiBase = "https://api.openai.com/v1";
           setPref("apiBase", settings.apiBase);
+          if (apiBaseEl) {
+            apiBaseEl.value = settings.apiBase;
+            apiBaseEl.setAttribute("value", settings.apiBase);
+          }
         }
         if (nextValue === "deepseek" && !settings.apiBase) {
           settings.apiBase = "https://api.deepseek.com";
           setPref("apiBase", settings.apiBase);
+          if (apiBaseEl) {
+            apiBaseEl.value = settings.apiBase;
+            apiBaseEl.setAttribute("value", settings.apiBase);
+          }
         }
         if (nextValue === "openai" && !settings.apiModel) {
           settings.apiModel = "gpt-4o-mini";
           setPref("apiModel", settings.apiModel);
+          if (apiModelEl) {
+            apiModelEl.value = settings.apiModel;
+            apiModelEl.setAttribute("value", settings.apiModel);
+          }
         }
         if (nextValue === "deepseek" && !settings.apiModel) {
           settings.apiModel = "deepseek-chat";
           setPref("apiModel", settings.apiModel);
+          if (apiModelEl) {
+            apiModelEl.value = settings.apiModel;
+            apiModelEl.setAttribute("value", settings.apiModel);
+          }
         }
       }
       setPref(key, nextValue);
-    });
+    };
+
+    applyValue(settings[key] ?? "");
+
+    const handler = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const nextValue = target?.value ?? "";
+      commitValue(nextValue);
+    };
+
+    element.addEventListener("change", handler);
+    element.addEventListener("command", handler);
   });
 }

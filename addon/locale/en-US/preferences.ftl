@@ -1,9 +1,12 @@
 pref-title = Zotero AI Newton Workspace
-pref-intro = Configure local agent credentials and dialogue style. Keys are stored locally and used when you ask AI questions from Zotero items or collections.
-pref-openai-key = OpenAI / compatible API key
-pref-openai-model = Preferred OpenAI model
-pref-deepseek-key = DeepSeek API key
-pref-deepseek-model = Preferred DeepSeek model
+pref-intro = Configure an OpenAI-compatible endpoint and dialogue style. Keys stay local and are used when you ask AI questions from Zotero items or collections.
+pref-provider = Provider
+pref-provider-openai = OpenAI compatible
+pref-provider-deepseek = DeepSeek
+pref-provider-custom = Custom / self-hosted
+pref-api-base = API base URL
+pref-api-key = API key or token
+pref-api-model = Model name
 pref-conversation-mode = Default context scope
 pref-conversation-auto = Auto (prefer selected items, fallback to collection)
 pref-conversation-item = Force item-level

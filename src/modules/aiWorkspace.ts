@@ -7,10 +7,18 @@ import {
 } from "./workspaceContext";
 import { requestLLMCompletion, summarizeContextForHistory } from "./llmClient";
 
+const PANEL_ID = "zotero-ai-workspace-pane";
+
 function renderHistory(container: HTMLElement, history: ChatTurn[]) {
   const doc = container.ownerDocument;
   if (!doc) return;
   container.replaceChildren();
+
+  const historyTitle = doc.createElement("div");
+  historyTitle.classList.add("ai-workspace-subheading");
+  historyTitle.textContent = getString("workspace-dialog-title");
+  container.appendChild(historyTitle);
+
   history.forEach((turn) => {
     const row = doc.createElement("div");
     row.classList.add("ai-workspace-line");
@@ -26,57 +34,48 @@ function renderHistory(container: HTMLElement, history: ChatTurn[]) {
 }
 
 function updateStatus(doc: Document, text: string) {
-  const status = doc.getElementById("ai-workspace-status");
+  const status = doc.getElementById(`${PANEL_ID}-status`);
   if (!status) return;
   status.textContent = text;
 }
 
-function synthesizeAnswer(
-  question: string,
-  context: WorkspaceContext,
-  history: ChatTurn[],
-) {
-  const intro = getString("workspace-answer-intro");
-  const contextText = describeItems(context.items, context.attachments);
-  const followup = history.length
-    ? getString("workspace-answer-followup")
-    : getString("workspace-answer-first");
-  return `${intro}\n${getString("workspace-answer-context")} ${contextText}\n${followup}\n\n${getString("workspace-answer-echo")} ${question}`;
+function getHistoryStore(): ChatTurn[] {
+  addon.data.aiSession ??= { history: [] } as { history: ChatTurn[] };
+  return addon.data.aiSession!.history;
+}
+
+function getWorkspaceBodies() {
+  const data = addon.data as any;
+  data.workspaceBodies ??= new WeakMap<Window, HTMLElement>();
+  return data.workspaceBodies as WeakMap<Window, HTMLElement>;
 }
 
 function buildSectionBody(body: HTMLElement, context: WorkspaceContext) {
   body.replaceChildren();
   const doc = body.ownerDocument;
   if (!doc) return;
-  const card = doc.createElement("div");
-  card.classList.add("ai-workspace-card");
 
-  const heading = doc.createElement("div");
-  heading.classList.add("ai-workspace-heading");
-  heading.textContent = getString("workspace-section-title");
+  if (doc.defaultView) {
+    getWorkspaceBodies().set(doc.defaultView, body);
+  }
+
+  const panel = doc.createElement("div");
+  panel.id = PANEL_ID;
+  panel.classList.add("ai-workspace-pane");
+
+  const toolbar = doc.createElement("div");
+  toolbar.classList.add("ai-workspace-toolbar");
+
+  const title = doc.createElement("div");
+  title.classList.add("ai-workspace-heading");
+  title.textContent = getString("workspace-section-title");
 
   const summary = doc.createElement("div");
   summary.classList.add("ai-workspace-summary");
   summary.textContent = `${getString("workspace-context")}: ${context.label}`;
 
-  const features = doc.createElement("ul");
-  features.classList.add("ai-workspace-list");
-  [
-    getString("workspace-feature-pdf"),
-    getString("workspace-feature-collection"),
-    getString("workspace-feature-dialog"),
-  ].forEach((text) => {
-    const li = doc.createElement("li");
-    li.textContent = text;
-    features.appendChild(li);
-  });
-
-  const buttons = doc.createElement("div");
-  buttons.classList.add("ai-workspace-actions");
-
-  const openBtn = doc.createElement("button");
-  openBtn.textContent = getString("workspace-open-dialog");
-  openBtn.addEventListener("click", () => openWorkspaceDialog());
+  const toolbarActions = doc.createElement("div");
+  toolbarActions.classList.add("ai-workspace-actions");
 
   const refreshBtn = doc.createElement("button");
   refreshBtn.textContent = getString("workspace-refresh-context");
@@ -84,14 +83,115 @@ function buildSectionBody(body: HTMLElement, context: WorkspaceContext) {
     buildSectionBody(body, collectContext()),
   );
 
-  buttons.appendChild(openBtn);
-  buttons.appendChild(refreshBtn);
+  const clearBtn = doc.createElement("button");
+  clearBtn.textContent = getString("workspace-close");
+  clearBtn.addEventListener("click", () => {
+    const history = getHistoryStore();
+    history.splice(0, history.length);
+    renderHistory(historyContainer, history);
+    updateStatus(doc, "");
+  });
 
-  card.appendChild(heading);
-  card.appendChild(summary);
-  card.appendChild(features);
-  card.appendChild(buttons);
-  body.appendChild(card);
+  toolbarActions.appendChild(refreshBtn);
+  toolbarActions.appendChild(clearBtn);
+
+  toolbar.appendChild(title);
+  toolbar.appendChild(summary);
+  toolbar.appendChild(toolbarActions);
+
+  const historyContainer = doc.createElement("div");
+  historyContainer.id = `${PANEL_ID}-history`;
+  historyContainer.classList.add("ai-workspace-history");
+
+  const statusLine = doc.createElement("div");
+  statusLine.id = `${PANEL_ID}-status`;
+  statusLine.classList.add("ai-workspace-status");
+
+  const inputArea = doc.createElement("div");
+  inputArea.classList.add("ai-workspace-input");
+
+  const textarea = doc.createElement("textarea");
+  textarea.id = `${PANEL_ID}-question`;
+  textarea.placeholder = getString("workspace-question-placeholder");
+  textarea.addEventListener("keydown", (e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      void sendHandler();
+    }
+  });
+
+  const footer = doc.createElement("div");
+  footer.classList.add("ai-workspace-footer");
+  const sendButton = doc.createElement("button");
+  sendButton.classList.add("ai-workspace-send");
+  sendButton.textContent = getString("workspace-send");
+
+  const history = getHistoryStore();
+  renderHistory(historyContainer, history);
+
+  const sendHandler = async () => {
+    const question = textarea.value.trim();
+    if (!question) {
+      updateStatus(doc, getString("workspace-error-empty-question"));
+      return;
+    }
+    const freshContext = collectContext();
+    summary.textContent = `${getString("workspace-context")}: ${freshContext.label}`;
+
+    history.push({
+      role: "user",
+      content: question,
+      contextLabel: freshContext.label,
+    });
+    textarea.value = "";
+    renderHistory(historyContainer, history);
+    updateStatus(doc, getString("workspace-status-waiting"));
+    try {
+      const answer = await requestLLMCompletion(
+        question,
+        freshContext,
+        history,
+      );
+      history.push({
+        role: "assistant",
+        content: answer,
+        contextLabel: summarizeContextForHistory(freshContext),
+      });
+      renderHistory(historyContainer, history);
+      updateStatus(doc, "");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : getString("workspace-status-error");
+      history.push({
+        role: "assistant",
+        content: `${getString("workspace-error-generic")}: ${message}`,
+        contextLabel: summarizeContextForHistory(freshContext),
+      });
+      renderHistory(historyContainer, history);
+      updateStatus(doc, message);
+    }
+  };
+
+  sendButton.addEventListener("click", () => void sendHandler());
+
+  inputArea.appendChild(textarea);
+  footer.appendChild(sendButton);
+
+  panel.appendChild(toolbar);
+  panel.appendChild(historyContainer);
+  panel.appendChild(statusLine);
+  panel.appendChild(inputArea);
+  panel.appendChild(footer);
+
+  // Quick context snapshot under the toolbar
+  const contextSummary = doc.createElement("div");
+  contextSummary.classList.add("ai-workspace-context-summary");
+  contextSummary.textContent = describeItems(context.items, context.attachments);
+  panel.insertBefore(contextSummary, historyContainer);
+
+  body.appendChild(panel);
 }
 
 export function registerWorkspaceSection() {
@@ -117,124 +217,28 @@ export function registerWorkspaceMenu() {
     tag: "menuitem",
     id: "zotero-ai-workspace-open",
     label: getString("workspace-menuitem-label"),
-    commandListener: () => openWorkspaceDialog(),
+    commandListener: () => openWorkspacePanel(),
     icon: `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`,
   });
 }
 
-export function openWorkspaceDialog() {
-  addon.data.aiSession ??= { history: [] } as { history: ChatTurn[] };
-  const dialogHelper = new ztoolkit.Dialog(12, 1);
-  dialogHelper
-    .addCell(0, 0, {
-      tag: "h1",
-      properties: { innerHTML: getString("workspace-dialog-title") },
-    })
-    .addCell(1, 0, {
-      tag: "p",
-      properties: {
-        innerHTML: getString("workspace-dialog-desc"),
-      },
-    });
-
-  dialogHelper.addCell(2, 0, {
-    tag: "div",
-    namespace: "html",
-    attributes: { id: "ai-workspace-history" },
-    styles: {
-      border: "1px solid var(--fill-section-border)",
-      padding: "8px",
-      height: "180px",
-      overflowY: "auto",
-      borderRadius: "6px",
-    },
-  });
-
-  dialogHelper.addCell(3, 0, {
-    tag: "textarea",
-    namespace: "html",
-    attributes: { id: "ai-workspace-question" },
-    styles: {
-      width: "100%",
-      height: "96px",
-    },
-    properties: {
-      placeholder: getString("workspace-question-placeholder"),
-    },
-  });
-
-  dialogHelper.addCell(4, 0, {
-    tag: "div",
-    namespace: "html",
-    attributes: { id: "ai-workspace-status" },
-    styles: {
-      color: "var(--text-color-deemphasized)",
-      minHeight: "20px",
-    },
-  });
-
-  dialogHelper
-    .addButton(getString("workspace-send"), "send", {
-      callback: async () => {
-        const doc = dialogHelper.window?.document;
-        if (!doc) return false;
-        const textarea = doc?.getElementById(
-          "ai-workspace-question",
-        ) as HTMLTextAreaElement | null;
-        const question = textarea?.value.trim();
-        if (!question) {
-          updateStatus(doc, getString("workspace-error-empty-question"));
-          return false;
-        }
-        const context = collectContext();
-        addon.data.aiSession!.history.push({
-          role: "user",
-          content: question,
-          contextLabel: context.label,
-        });
-        textarea!.value = "";
-        const container = doc.getElementById(
-          "ai-workspace-history",
-        ) as HTMLElement | null;
-        if (container) renderHistory(container, addon.data.aiSession!.history);
-        updateStatus(doc, getString("workspace-status-waiting"));
-        try {
-          const answer = await requestLLMCompletion(
-            question,
-            context,
-            addon.data.aiSession!.history,
-          );
-          addon.data.aiSession!.history.push({
-            role: "assistant",
-            content: answer,
-            contextLabel: summarizeContextForHistory(context),
-          });
-          if (container)
-            renderHistory(container, addon.data.aiSession!.history);
-          updateStatus(doc, "");
-        } catch (err: unknown) {
-          const message =
-            err instanceof Error
-              ? err.message
-              : getString("workspace-status-error");
-          addon.data.aiSession!.history.push({
-            role: "assistant",
-            content: `${getString("workspace-error-generic")}: ${message}`,
-            contextLabel: summarizeContextForHistory(context),
-          });
-          if (container)
-            renderHistory(container, addon.data.aiSession!.history);
-          updateStatus(doc, message);
-        }
-        return false;
-      },
-    })
-    .addButton(getString("workspace-close"), "cancel");
-
-  dialogHelper.open(getString("workspace-dialog-title"));
-  const container = dialogHelper.window?.document?.getElementById(
-    "ai-workspace-history",
-  ) as HTMLElement | null;
-  if (container) renderHistory(container, addon.data.aiSession.history);
-  addon.data.dialog = dialogHelper;
+export function openWorkspacePanel() {
+  const pane = ztoolkit.getGlobal("ZoteroPane");
+  const doc = pane?.document;
+  if (!doc) return;
+  const win = doc.defaultView || undefined;
+  const body =
+    getWorkspaceBodies().get(win as Window) ||
+    (doc.querySelector(`#${PANEL_ID}`)?.parentElement as HTMLElement | null) ||
+    (doc.querySelector(
+      `[data-section-id="ai-workspace"] .section-body`,
+    ) as HTMLElement | null) ||
+    (doc.querySelector(
+      `[data-pane-id="ai-workspace"] .section-body`,
+    ) as HTMLElement | null);
+  if (!body) return;
+  const section = body.closest(".section-container") as HTMLElement | null;
+  section?.classList.remove("collapsed");
+  body.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  buildSectionBody(body, collectContext());
 }

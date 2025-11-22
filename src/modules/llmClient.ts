@@ -9,10 +9,10 @@ import {
 } from "./workspaceContext";
 
 interface ProviderChoice {
-  name: "openai" | "deepseek";
+  name: "openai" | "deepseek" | "custom";
   key: string;
   model: string;
-  endpoint: string;
+  apiBase: string;
 }
 
 interface ChatMessage {
@@ -21,28 +21,53 @@ interface ChatMessage {
 }
 
 function resolveProvider(): ProviderChoice {
-  const openaiKey = (getPref("openaiKey") as string) || "";
-  const deepseekKey = (getPref("deepseekKey") as string) || "";
-  if (openaiKey) {
-    const openaiModel = (getPref("openaiModel") as string) || "gpt-4o-mini";
-    return {
-      name: "openai",
-      key: openaiKey,
-      model: openaiModel,
-      endpoint: "https://api.openai.com/v1/chat/completions",
-    };
+  const providerPref = ((getPref("provider") as string) || "openai").trim();
+  let apiKey = (getPref("apiKey") as string) || "";
+  let apiBase = (getPref("apiBase") as string) || "";
+  let apiModel = (getPref("apiModel") as string) || "";
+
+  const legacyOpenAIKey = (getPref("openaiKey") as string) || "";
+  const legacyOpenAIModel = (getPref("openaiModel") as string) || "gpt-4o-mini";
+  const legacyDeepSeekKey = (getPref("deepseekKey") as string) || "";
+  const legacyDeepSeekModel =
+    (getPref("deepseekModel") as string) || "deepseek-chat";
+
+  let name: ProviderChoice["name"] = (providerPref as ProviderChoice["name"]) ||
+    "openai";
+
+  if (!apiKey && legacyOpenAIKey) {
+    apiKey = legacyOpenAIKey;
+    if (!apiModel) apiModel = legacyOpenAIModel;
+    if (!apiBase) apiBase = "https://api.openai.com/v1";
+    name = "openai";
+  } else if (!apiKey && legacyDeepSeekKey) {
+    apiKey = legacyDeepSeekKey;
+    if (!apiModel) apiModel = legacyDeepSeekModel;
+    if (!apiBase) apiBase = "https://api.deepseek.com";
+    name = "deepseek";
+  } else {
+    if (!apiBase) {
+      apiBase =
+        name === "deepseek"
+          ? "https://api.deepseek.com"
+          : "https://api.openai.com/v1";
+    }
+    if (!apiModel) {
+      apiModel = name === "deepseek" ? "deepseek-chat" : "gpt-4o-mini";
+    }
   }
-  if (deepseekKey) {
-    const deepseekModel =
-      (getPref("deepseekModel") as string) || "deepseek-chat";
-    return {
-      name: "deepseek",
-      key: deepseekKey,
-      model: deepseekModel,
-      endpoint: "https://api.deepseek.com/chat/completions",
-    };
+
+  if (!apiKey) {
+    throw new Error(getString("workspace-error-missing-key"));
   }
-  throw new Error(getString("workspace-error-missing-key"));
+
+  const normalizedBase = apiBase.replace(/\/+$/, "");
+  return {
+    name,
+    key: apiKey,
+    model: apiModel,
+    apiBase: normalizedBase,
+  };
 }
 
 function buildMessages(
@@ -97,7 +122,11 @@ export async function requestLLMCompletion(
   };
 
   try {
-    const data = await postJSON(provider.endpoint, payload, provider.key);
+    const data = await postJSON(
+      `${provider.apiBase}/chat/completions`,
+      payload,
+      provider.key,
+    );
     const content = data?.choices?.[0]?.message?.content;
     if (!content) {
       throw new Error(getString("workspace-error-empty"));

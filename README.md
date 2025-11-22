@@ -45,12 +45,12 @@ Zotero AI Newton brings a Bohrium-inspired knowledge workspace directly into Zot
 
 ## Configuration
 
-Open **Edit → Preferences → Zotero AI Newton** to provide API keys, default models, conversation scope (item, collection, or auto), and response tone. These settings stay local to Zotero and are used by the AI workspace pane and menu action.
+Open **Edit → Preferences → Zotero AI Newton** to choose your provider (OpenAI/DeepSeek/custom), API base URL, key, default model, conversation scope (item, collection, or auto), and response tone. These settings stay local to Zotero and are used by the AI workspace pane and menu action.
 
 ## Usage
 
 - Select one or more items or a collection and open the **AI Workspace** section in the item pane to review the current context.
-- Click **Open chat surface** (or the item menu entry) to start a multi-turn conversation. The assistant will reference the active selection and any attached PDFs.
+- Open the **Zotero AI Newton** sidebar in the right panel (or use the item menu entry) to start a multi-turn conversation that follows your current selection and attached PDFs.
 - Refresh the context snapshot whenever you change selections or folders.
 
 ## Development

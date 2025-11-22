@@ -3,20 +3,20 @@ import { getString } from "../utils/locale";
 import { getPref, setPref } from "../utils/prefs";
 
 type AISettingKey =
-  | "openaiKey"
-  | "openaiModel"
-  | "deepseekKey"
-  | "deepseekModel"
+  | "provider"
+  | "apiBase"
+  | "apiKey"
+  | "apiModel"
   | "conversationMode"
   | "agentTone";
 
 type AISettings = Record<AISettingKey, string>;
 
 const DEFAULT_SETTINGS: AISettings = {
-  openaiKey: "",
-  openaiModel: "gpt-4o-mini",
-  deepseekKey: "",
-  deepseekModel: "deepseek-chat",
+  provider: "openai",
+  apiBase: "https://api.openai.com/v1",
+  apiKey: "",
+  apiModel: "gpt-4o-mini",
   conversationMode: "auto",
   agentTone: "concise",
 };
@@ -58,12 +58,32 @@ function loadSettingsFromPrefs(): AISettings {
   Object.entries(DEFAULT_SETTINGS).forEach(([key, fallback]) => {
     const value = getPref(key);
     if (value === undefined || value === null || value === "") {
-      setPref(key, fallback);
       merged[key as AISettingKey] = fallback;
     } else {
       merged[key as AISettingKey] = String(value);
     }
   });
+
+  const legacyOpenAIKey = getPref("openaiKey");
+  const legacyOpenAIModel = getPref("openaiModel");
+  const legacyDeepSeekKey = getPref("deepseekKey");
+  const legacyDeepSeekModel = getPref("deepseekModel");
+
+  if (!merged.apiKey && legacyOpenAIKey) {
+    merged.provider = "openai";
+    merged.apiKey = String(legacyOpenAIKey);
+    merged.apiBase = "https://api.openai.com/v1";
+    merged.apiModel = (legacyOpenAIModel as string) || "gpt-4o-mini";
+  } else if (!merged.apiKey && legacyDeepSeekKey) {
+    merged.provider = "deepseek";
+    merged.apiKey = String(legacyDeepSeekKey);
+    merged.apiBase = "https://api.deepseek.com";
+    merged.apiModel = (legacyDeepSeekModel as string) || "deepseek-chat";
+  }
+
+  Object.entries(merged).forEach(([key, value]) =>
+    setPref(key, value as string),
+  );
   return merged as AISettings;
 }
 
@@ -115,20 +135,8 @@ async function updatePrefsUI() {
           detail: "no data",
         },
     )
-    // Show a progress window when selection changes
-    .setProp("onSelectionChange", (selection) => {
-      const selected = addon.data.prefs?.rows
-        .filter((_, i) => selection.isSelected(i))
-        .map((row) => row.title);
-      if (!selected?.length) return true;
-      new ztoolkit.ProgressWindow(config.addonName)
-        .createLine({
-          text: selected.join(", "),
-          progress: 100,
-        })
-        .show();
-      return true;
-    })
+    // No popup on selection; keep table focused on readability
+    .setProp("onSelectionChange", () => true)
     // For find-as-you-type
     .setProp(
       "getRowString",
@@ -157,24 +165,24 @@ function bindPrefEvents() {
     prop?: "value" | "checked";
   }> = [
     {
-      selector: `#zotero-prefpane-${config.addonRef}-openai-key`,
-      key: "openaiKey",
-    },
-    {
-      selector: `#zotero-prefpane-${config.addonRef}-openai-model`,
-      key: "openaiModel",
-    },
-    {
-      selector: `#zotero-prefpane-${config.addonRef}-deepseek-key`,
-      key: "deepseekKey",
-    },
-    {
-      selector: `#zotero-prefpane-${config.addonRef}-deepseek-model`,
-      key: "deepseekModel",
+      selector: `#zotero-prefpane-${config.addonRef}-provider`,
+      key: "provider",
     },
     {
       selector: `#zotero-prefpane-${config.addonRef}-conversation-mode`,
       key: "conversationMode",
+    },
+    {
+      selector: `#zotero-prefpane-${config.addonRef}-api-base`,
+      key: "apiBase",
+    },
+    {
+      selector: `#zotero-prefpane-${config.addonRef}-api-key`,
+      key: "apiKey",
+    },
+    {
+      selector: `#zotero-prefpane-${config.addonRef}-api-model`,
+      key: "apiModel",
     },
     {
       selector: `#zotero-prefpane-${config.addonRef}-agent-tone`,
@@ -192,6 +200,24 @@ function bindPrefEvents() {
       settings[key] = nextValue;
       if (prefs.settings) {
         prefs.settings[key] = nextValue;
+      }
+      if (key === "provider") {
+        if (nextValue === "openai" && !settings.apiBase) {
+          settings.apiBase = "https://api.openai.com/v1";
+          setPref("apiBase", settings.apiBase);
+        }
+        if (nextValue === "deepseek" && !settings.apiBase) {
+          settings.apiBase = "https://api.deepseek.com";
+          setPref("apiBase", settings.apiBase);
+        }
+        if (nextValue === "openai" && !settings.apiModel) {
+          settings.apiModel = "gpt-4o-mini";
+          setPref("apiModel", settings.apiModel);
+        }
+        if (nextValue === "deepseek" && !settings.apiModel) {
+          settings.apiModel = "deepseek-chat";
+          setPref("apiModel", settings.apiModel);
+        }
       }
       setPref(key, nextValue);
     });

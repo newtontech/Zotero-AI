@@ -1,9 +1,12 @@
 pref-title = Zotero AI Newton 工作台
-pref-intro = 配置本地代理的模型密钥与回答风格。密钥仅保存在本地，用于在条目或文件夹里向 AI 追问。
-pref-openai-key = OpenAI / 兼容接口密钥
-pref-openai-model = 首选 OpenAI 模型
-pref-deepseek-key = DeepSeek 密钥
-pref-deepseek-model = 首选 DeepSeek 模型
+pref-intro = 配置兼容 OpenAI 的接口与对话风格。密钥仅保存在本地，用于在条目或文件夹里向 AI 追问。
+pref-provider = 服务提供方
+pref-provider-openai = OpenAI 兼容
+pref-provider-deepseek = DeepSeek
+pref-provider-custom = 自定义 / 自建
+pref-api-base = API 基址
+pref-api-key = API 密钥或令牌
+pref-api-model = 模型名称
 pref-conversation-mode = 默认对话范围
 pref-conversation-auto = 自动（优先选中文献，无则使用当前文件夹）
 pref-conversation-item = 仅针对单条条目

@@ -2,14 +2,20 @@
   background-color: tomato;
 }
 
-.ai-workspace-card {
+.ai-workspace-pane {
   padding: 12px;
   border: 1px solid var(--fill-section-border);
   border-radius: 8px;
   background: var(--fill-section);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.ai-workspace-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .ai-workspace-heading {
@@ -19,16 +25,36 @@
 
 .ai-workspace-summary {
   color: var(--text-color-secondary);
+  font-size: 12px;
 }
 
-.ai-workspace-list {
-  margin: 0;
-  padding-left: 18px;
+.ai-workspace-context-summary {
+  color: var(--text-color-secondary);
+  font-size: 12px;
+  border-left: 2px solid var(--fill-section-border);
+  padding-left: 8px;
 }
 
 .ai-workspace-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-workspace-history {
+  border: 1px solid var(--fill-section-border);
+  padding: 8px;
+  min-height: 140px;
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 6px;
+  background: var(--fill-section);
+  background: color-mix(in srgb, var(--fill-section) 80%, var(--background-primary) 20%);
+}
+
+.ai-workspace-subheading {
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .ai-workspace-line {
@@ -36,13 +62,32 @@
   border-bottom: 1px dashed var(--fill-section-border);
 }
 
+.ai-workspace-line:last-child {
+  border-bottom: none;
+}
+
 .ai-workspace-context {
   font-size: 11px;
   color: var(--text-color-secondary);
 }
 
-#ai-workspace-status {
+.ai-workspace-status {
   margin-top: 6px;
   font-size: 0.9em;
   color: var(--text-color-secondary);
+}
+
+.ai-workspace-input textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 8px;
+}
+
+.ai-workspace-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ai-workspace-send {
+  padding: 8px 12px;
 }

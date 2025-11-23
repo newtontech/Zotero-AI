@@ -2,6 +2,8 @@
 
 Zotero AI Newton 在 Zotero 中提供类似“玻尔知识库”的本地智能工作区，可针对单篇文献、附件 PDF 或整个文件夹进行多轮对话，并支持自定义 LLM 提供商。
 
+📣 宣传站点：https://newtontech.github.io/Zotero-AI-Newton-website
+
 ## 主要特性
 
 - **本地知识工作区**：对话历史与当前选中条目同步。

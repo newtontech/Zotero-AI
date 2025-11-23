@@ -1,71 +1,75 @@
-# Zotero AI Newton
+# 🚀 Zotero AI Newton
 
-[![zotero target version](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
+<div align="center">
+  [![Zotero](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
+  [![Stars](https://img.shields.io/github/stars/newtontech/Zotero-AI-Newton?style=social)](https://github.com/newtontech/Zotero-AI-Newton)
+  [![License](https://img.shields.io/github/license/newtontech/Zotero-AI-Newton?style=flat-square)](LICENSE)
+  [![Beta](https://img.shields.io/badge/version-0.0.1-beta-orange?style=flat-square)](release/zotero-ai-newton-0.0.1-beta.xpi)
+</div>
 
-Zotero AI Newton brings a Bohrium-inspired knowledge workspace directly into Zotero. It lets you chat with a single item, attached PDFs, or an entire collection using your preferred LLM provider while keeping all data local to your library.
+<div align="center">[English](README.md) | [简体中文](release/README-zhCN.md)</div>
 
-## Features
+> **Transform your Zotero into an AI-powered knowledge hub!** 💥  
+> Chat with items, PDFs, or entire collections using OpenAI, DeepSeek, or custom LLMs. All data stays local. No more fragmented notes—unlock seamless AI research!
 
-- **Local knowledge workspace**: multi-turn chat that remembers history and mirrors your current Zotero selection.
-- **PDF-aware answers**: summarize and question PDFs linked to selected items.
-- **Collection reasoning**: compare or combine insights across folders before sending prompts to an LLM.
-- **Pluggable models**: supply OpenAI or DeepSeek API keys and models from the preferences pane.
-- **Tone controls**: switch between concise, detailed, or creative responses without changing prompts.
 
-## Installation
 
-### Quick install (prebuilt 0.0.1-beta)
+## ✨ Killer Features
 
-1. Download the signed XPI from the `release` folder (no build needed):
-   - From this repository: [`release/zotero-ai-newton-0.0.1-beta.xpi`](release/zotero-ai-newton-0.0.1-beta.xpi)
-   - Direct raw link: https://raw.githubusercontent.com/newtontech/Zotero-AI-Newton/main/release/zotero-ai-newton-0.0.1-beta.xpi
-2. In Zotero, open **Tools → Add-ons**, choose **Install Add-on From File…**, and select the downloaded XPI.
-3. Automatic beta updates are served from `release/update-beta.json`, so you can stay on the beta channel without rebuilding.
+- 🧠 **AI Knowledge Workspace**: Multi-turn chats with full history, auto-syncing your Zotero selection
+- 📄 **PDF Superpowers**: Instant summaries & Q&A on attached PDFs
+- 📂 **Collection Intelligence**: Aggregate & reason across folders before LLM calls
+- 🔌 **Model Agnostic**: OpenAI, DeepSeek, or custom—plug in your API key & model
+- 🎨 **Tone Mastery**: Concise, detailed, or creative responses at the flip of a switch
 
-### Post-install setup
+## 🚀 Lightning-Fast Install (Prebuilt Beta)
 
-1. Open **Edit → Preferences → Zotero AI Newton**.
-2. Paste your **OpenAI** or **DeepSeek** API key and preferred model.
-3. Pick the default conversation scope (auto/item/collection) and response tone, then save.
-4. Ensure Zotero can reach the internet so the plugin can call your chosen LLM provider.
+1. 🎯 **[Download XPI Now](release/zotero-ai-newton-0.0.1-beta.xpi)** – No build required!
+2. Zotero: **Tools → Add-ons → Install Add-on From File** → Pick the XPI
+3. ✅ **Auto-Updates** via `release/update-beta.json` – Stay on bleeding edge!
 
-### Build from source
 
-1. Install Node.js LTS and a Zotero 7 build.
-2. Clone this repository and install dependencies:
-   ```sh
-   npm install
-   ```
-3. Build the XPI package:
-   ```sh
-   npm run build
-   ```
-   The compiled add-on will appear under `.scaffold/build`.
-4. In Zotero, open **Tools → Add-ons**, choose **Install Add-on From File…**, and select the generated XPI.
 
-## Configuration
+### ⚙️ 2-Min Setup
 
-Open **Edit → Preferences → Zotero AI Newton** to choose your provider (OpenAI/DeepSeek/custom), API base URL, key, default model, conversation scope (item, collection, or auto), and response tone. These settings stay local to Zotero and are used by the AI workspace pane and menu action.
+1. **Edit → Preferences → Zotero AI Newton**
+2. Enter your **OpenAI/DeepSeek API key** + model
+3. Choose scope (auto/item/collection) & tone → **Save**
+4. Go online – You're AI-ready! 🚀
 
-## Usage
+### 🔨 Build from Source (Devs)
 
-- Select one or more items or a collection and open the **AI Workspace** section in the item pane to review the current context.
-- Open the **Zotero AI Newton** sidebar in the right panel (or use the item menu entry) to start a multi-turn conversation that follows your current selection and attached PDFs.
-- Refresh the context snapshot whenever you change selections or folders.
+```bash
+git clone https://github.com/newtontech/Zotero-AI-Newton
+cd Zotero-AI-Newton
+npm install
+npm run build  # → .scaffold/build/*.xpi
+```
 
-## Development
+Install the XPI as above. Hot-reload: `npm run start` 🔥
 
-- Hot reload during development:
-  ```sh
-  npm run start
-  ```
-- Lint and format checks:
-  ```sh
-  npm run lint:check
-  ```
-- Build before submitting changes:
-  ```sh
-  npm run build
-  ```
+## ⚙️ Customize Your AI
 
-Contributions that extend the AI workflows (better context gathering, richer prompts, additional model providers) are welcome.
+**Edit → Preferences → Zotero AI Newton**: Pick provider, API URL/key, model, scope & tone. All local, zero telemetry! 🔒
+
+## 🎯 Get Started in Seconds
+
+- Select items/collection → **AI Workspace** tab for context preview
+- Open **Zotero AI Newton** sidebar (or right-click menu) → Chat away! 💬
+- 🔄 Refresh context on selection changes
+
+## 👨‍💻 Dev Mode
+
+```bash
+npm run start     # 🌡️ Hot reload
+npm run lint:check # 🔍 Code quality
+npm run build      # 📦 Release XPI
+```
+
+## 🌟 Join the Revolution
+
+⭐ **Star us** on GitHub!  
+🤝 **Contribute**: Better prompts, new models, PDF magic? PRs welcome!  
+💬 **Feedback**: Issues or Discord soon...
+
+**Made with ❤️ for researchers worldwide.**

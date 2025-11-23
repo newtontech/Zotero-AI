@@ -1,5 +1,9 @@
 # 🚀 Zotero AI Newton
 
+<p align="center">
+  <img src="addon/content/icons/newton-n-star.svg" alt="Zotero AI Newton icon" width="220" />
+</p>
+
 <div align="center">
   [![Zotero](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
   [![Stars](https://img.shields.io/github/stars/newtontech/Zotero-AI-Newton?style=social)](https://github.com/newtontech/Zotero-AI-Newton)
@@ -65,6 +69,11 @@ npm run start     # 🌡️ Hot reload
 npm run lint:check # 🔍 Code quality
 npm run build      # 📦 Release XPI
 ```
+
+## 🖼️ Brand Assets
+
+- Primary icon: `addon/content/icons/newton-n-star.svg`
+- Icons are centralized under `addon/content/icons` to avoid scattered asset folders.
 
 ## 🌟 Join the Revolution
 

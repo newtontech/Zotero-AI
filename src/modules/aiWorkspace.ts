@@ -349,7 +349,7 @@ export function registerWorkspaceMenu() {
     id: "zotero-ai-workspace-open",
     label: getString("workspace-menuitem-label"),
     commandListener: () => openWorkspacePanel(),
-    icon: `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`,
+    icon: `chrome://${addon.data.config.addonRef}/content/icons/favicon.svg`,
   });
 }
 

@@ -1,8 +1,9 @@
 // Navbar Component
 window.Navbar = ({ lang, setLang }) => {
     const { Header } = antd.Layout;
-    const { Title, Space, Button } = antd;
-    const { Globe } = lucideReact;
+    const { Title } = antd.Typography;
+    const { Space, Button } = antd;
+    const { GlobalOutlined } = window.icons;
     const t = window.AppData[lang].nav;
 
     return (
@@ -23,7 +24,7 @@ window.Navbar = ({ lang, setLang }) => {
                 <antd.Button
                     shape="round"
                     onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
-                    icon={<Globe size={16} />}
+                    icon={<GlobalOutlined />}
                 >
                     {lang === 'en' ? '中文' : 'English'}
                 </antd.Button>

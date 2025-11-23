@@ -3,7 +3,7 @@ window.AppFooter = () => {
     const { Layout, Typography, Space } = antd;
     const { Footer } = Layout;
     const { Paragraph } = Typography;
-    const { Github, Globe } = lucideReact;
+    const { GithubOutlined, GlobalOutlined } = window.icons;
 
     return (
         <Footer style={{ textAlign: 'center', background: '#001529', color: '#fff', padding: '60px 20px' }}>
@@ -14,8 +14,8 @@ window.AppFooter = () => {
                 Made with ❤️ for researchers worldwide.
             </Paragraph>
             <Space size="large">
-                <a href="https://github.com/newtontech/Zotero-AI-Newton" style={{ color: '#fff' }}><Github /></a>
-                <a href="#" style={{ color: '#fff' }}><Globe /></a>
+                <a href="https://github.com/newtontech/Zotero-AI-Newton" style={{ color: '#fff' }}><GithubOutlined /></a>
+                <a href="#" style={{ color: '#fff' }}><GlobalOutlined /></a>
             </Space>
         </Footer>
     );

@@ -3,16 +3,16 @@ window.Features = ({ lang }) => {
     const { Row, Col, Card, Typography } = antd;
     const { Title, Paragraph } = Typography;
     const { motion } = window.Motion;
-    const { MessageSquare, FileText, FolderOpen, Cpu, Zap, Shield } = lucideReact;
+    const { MessageOutlined, FileTextOutlined, FolderOpenOutlined, RobotOutlined, ThunderboltOutlined, SafetyCertificateOutlined } = window.icons;
     const t = window.AppData[lang].features;
 
     const iconMap = {
-        MessageSquare: <MessageSquare size={24} />,
-        FileText: <FileText size={24} />,
-        FolderOpen: <FolderOpen size={24} />,
-        Cpu: <Cpu size={24} />,
-        Zap: <Zap size={24} />,
-        Shield: <Shield size={24} />
+        MessageSquare: <MessageOutlined style={{ fontSize: '24px' }} />,
+        FileText: <FileTextOutlined style={{ fontSize: '24px' }} />,
+        FolderOpen: <FolderOpenOutlined style={{ fontSize: '24px' }} />,
+        Cpu: <RobotOutlined style={{ fontSize: '24px' }} />,
+        Zap: <ThunderboltOutlined style={{ fontSize: '24px' }} />,
+        Shield: <SafetyCertificateOutlined style={{ fontSize: '24px' }} />
     };
 
     return (

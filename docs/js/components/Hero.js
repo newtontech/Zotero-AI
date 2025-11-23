@@ -2,7 +2,7 @@
 window.Hero = ({ lang }) => {
     const { Row, Col, Typography, Button, Space, Tag, Card, Avatar } = antd;
     const { Title, Paragraph, Text } = Typography;
-    const { Download, Github } = lucideReact;
+    const { DownloadOutlined, GithubOutlined } = window.icons;
     const { motion } = window.Motion;
     const t = window.AppData[lang].hero;
 
@@ -33,10 +33,10 @@ window.Hero = ({ lang }) => {
                                 {t.subtitle}
                             </Paragraph>
                             <Space size="middle" wrap>
-                                <Button type="primary" size="large" shape="round" icon={<Download size={18} />} href="https://raw.githubusercontent.com/newtontech/Zotero-AI-Newton/main/release/zotero-ai-newton-0.0.1-beta.xpi" style={{ height: '50px', padding: '0 32px', fontSize: '16px' }}>
+                                <Button type="primary" size="large" shape="round" icon={<DownloadOutlined />} href="https://raw.githubusercontent.com/newtontech/Zotero-AI-Newton/main/release/zotero-ai-newton-0.0.1-beta.xpi" style={{ height: '50px', padding: '0 32px', fontSize: '16px' }}>
                                     {t.ctaPrimary}
                                 </Button>
-                                <Button size="large" shape="round" icon={<Github size={18} />} href="https://github.com/newtontech/Zotero-AI-Newton" style={{ height: '50px', padding: '0 32px', fontSize: '16px' }}>
+                                <Button size="large" shape="round" icon={<GithubOutlined />} href="https://github.com/newtontech/Zotero-AI-Newton" style={{ height: '50px', padding: '0 32px', fontSize: '16px' }}>
                                     {t.ctaSecondary}
                                 </Button>
                             </Space>
